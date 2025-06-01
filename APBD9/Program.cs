@@ -1,30 +1,18 @@
-namespace APBD9;
+using APBD9.Data;
+using Microsoft.EntityFrameworkCore;
+using APBD9.Services;
 
-public class Program
-{
-    public static void Main(string[] args)
-    {
-        var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
-        // Add services to the container.
+builder.Services.AddControllers();
+builder.Services.AddDbContext<DatabaseContext>(options => 
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+);
 
-        builder.Services.AddControllers();
-        // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-        builder.Services.AddOpenApi();
+builder.Services.AddScoped<IPrescriptionService, PrescriptionService>();
+builder.Services.AddEndpointsApiExplorer();
 
-        var app = builder.Build();
-
-        // Configure the HTTP request pipeline.
-        if (app.Environment.IsDevelopment())
-        {
-            app.MapOpenApi();
-        }
-
-        app.UseAuthorization();
-
-
-        app.MapControllers();
-
-        app.Run();
-    }
-}
+var app = builder.Build();
+app.UseAuthorization();
+app.MapControllers();
+app.Run();
